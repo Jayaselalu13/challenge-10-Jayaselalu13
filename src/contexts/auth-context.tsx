@@ -16,8 +16,6 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
   loading: boolean
-  profileLikes: number
-  incrementProfileLikes: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -25,23 +23,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [profileLikes, setProfileLikes] = useState(0)
 
   useEffect(() => {
-    // Check for stored auth token
-    const token = localStorage.getItem("auth_token")
-    const userData = localStorage.getItem("user_data")
-
-    if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData)
-        setUser(parsedUser)
-      } catch (error) {
-        console.error("Error parsing stored user data:", error)
+    // Clear any existing mock data on startup
         localStorage.removeItem("auth_token")
         localStorage.removeItem("user_data")
-      }
-    }
+    setUser(null)
     setLoading(false)
   }, [])
 
@@ -101,11 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }
 
-  const incrementProfileLikes = () => {
-    setProfileLikes((prev) => prev + 1)
-  }
-
-  return <AuthContext.Provider value={{ user, login, register, logout, loading, profileLikes, incrementProfileLikes }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, login, register, logout, loading }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

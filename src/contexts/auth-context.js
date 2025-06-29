@@ -17,22 +17,11 @@ const AuthContext = (0, react_1.createContext)(undefined);
 function AuthProvider({ children }) {
     const [user, setUser] = (0, react_1.useState)(null);
     const [loading, setLoading] = (0, react_1.useState)(true);
-    const [profileLikes, setProfileLikes] = (0, react_1.useState)(0);
     (0, react_1.useEffect)(() => {
-        // Check for stored auth token
-        const token = localStorage.getItem("auth_token");
-        const userData = localStorage.getItem("user_data");
-        if (token && userData) {
-            try {
-                const parsedUser = JSON.parse(userData);
-                setUser(parsedUser);
-            }
-            catch (error) {
-                console.error("Error parsing stored user data:", error);
-                localStorage.removeItem("auth_token");
-                localStorage.removeItem("user_data");
-            }
-        }
+        // Clear any existing mock data on startup
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user_data");
+        setUser(null);
         setLoading(false);
     }, []);
     const login = (email, password) => __awaiter(this, void 0, void 0, function* () {
@@ -82,10 +71,7 @@ function AuthProvider({ children }) {
         localStorage.removeItem("user_data");
         setUser(null);
     };
-    const incrementProfileLikes = () => {
-        setProfileLikes((prev) => prev + 1);
-    };
-    return <AuthContext.Provider value={{ user, login, register, logout, loading, profileLikes, incrementProfileLikes }}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={{ user, login, register, logout, loading }}>{children}</AuthContext.Provider>;
 }
 function useAuth() {
     const context = (0, react_1.useContext)(AuthContext);
